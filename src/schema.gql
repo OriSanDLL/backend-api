@@ -1,0 +1,275 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type PaginationOutputDto {
+  totalItems: Int!
+  currentPage: Int!
+  totalPages: Int!
+  itemsPerPage: Int!
+  hasNextPage: Boolean!
+  hasPreviousPage: Boolean!
+}
+
+type CorrectionReply {
+  id: ID!
+  correctionId: String!
+  comment: String!
+  createdBy: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  creator: User
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type CorrectionSentence {
+  id: ID!
+  correctionId: ID!
+  index: Float!
+  originalText: String!
+  correctedText: String
+  explanation: String
+  isCorrect: Boolean!
+  rating: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type HashtagCount {
+  essays: Float!
+}
+
+type Hashtag {
+  id: ID!
+  name: String!
+  usageCount: Float!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  essays: [EssayHashtag!]
+  _count: HashtagCount
+}
+
+type EssayHashtag {
+  id: ID!
+  essayId: ID!
+  hashtagId: ID!
+  createdAt: DateTime!
+  essay: Essay
+  hashtag: Hashtag
+}
+
+type SpaceCount {
+  essays: Int!
+  notes: Int!
+  vocabularies: Int!
+}
+
+type Space {
+  id: ID!
+  name: String!
+  description: String
+  language: LanguageCode!
+  target: TargetCode!
+  currentLevel: LevelCode!
+  topics: TopicCode!
+  targetLevel: LevelCode!
+  createdBy: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime!
+  _count: SpaceCount
+  creator: User
+}
+
+"""Available language codes"""
+enum LanguageCode {
+  ENGLISH
+  VIETNAMESE
+}
+
+"""Learning target codes"""
+enum TargetCode {
+  COMMUNICATION
+  IELTS
+  TOEIC
+  OTHER
+}
+
+"""Proficiency level codes"""
+enum LevelCode {
+  BEGINNER
+  ELEMENTARY
+  INTERMEDIATE
+  UPPER_INTERMEDIATE
+  ADVANCED
+  MASTER
+}
+
+"""Learning topic codes"""
+enum TopicCode {
+  BUSINESS
+  ACADEMIC
+  TRAVEL
+  DAILY_LIFE
+  TECHNOLOGY
+  OTHER
+}
+
+type Essay {
+  id: ID!
+  spaceId: String!
+  title: String!
+  summary: String
+  content: String!
+  upvoteCount: Float!
+  coverUrl: String
+  status: EssayStatus!
+  language: String!
+  createdBy: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime!
+  space: Space
+  author: User
+  corrections: [Correction!]
+  hashtags: [EssayHashtag!]
+}
+
+"""The status of an essay"""
+enum EssayStatus {
+  draft
+  public
+  private
+  deleted
+}
+
+type Correction {
+  id: ID!
+  essayId: String!
+  overallComment: String
+  rating: String
+  createdBy: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime!
+  essay: Essay
+  creator: User
+  sentences: [CorrectionSentence!]
+  replies: [CorrectionReply!]
+}
+
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  passwordHash: String
+  role: UserRole!
+  authProvider: AuthProvider!
+  authProviderId: String
+  firstName: String
+  lastName: String
+  profilePicture: String
+  isEmailVerified: Boolean!
+  nativeLanguage: LanguageCode!
+  lastLogin: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  deletedAt: DateTime
+}
+
+"""User roles in the system"""
+enum UserRole {
+  user
+  admin
+  teacher
+}
+
+"""Authentication providers"""
+enum AuthProvider {
+  local
+  google
+  facebook
+}
+
+type CorrectionResponseOneDto {
+  id: ID!
+  essayId: String!
+  createdBy: String!
+  overall_comment: String
+  rating: Float
+  createdAt: DateTime!
+  updatedAt: DateTime!
+  creator: User
+  sentences: [CorrectionSentence!]
+}
+
+type CorrectionResponseAllDto {
+  data: [CorrectionResponseOneDto!]!
+  pagination: PaginationOutputDto!
+}
+
+type SpacesResponse {
+  data: [Space!]!
+  pagination: PaginationOutputDto!
+}
+
+type Query {
+  getUserSpaces(input: GetUserSpacesDto!): SpacesResponse!
+  getCorrectionsByEssay(input: GetCorrectionsByEssayDto!): CorrectionResponseAllDto
+  getCorrectionIfExist(essayId: String!): CorrectionResponseOneDto
+}
+
+input GetUserSpacesDto {
+  userId: String!
+  page: Float
+  perPage: Float
+  search: String
+}
+
+input GetCorrectionsByEssayDto {
+  page: Int! = 1
+  perPage: Int! = 10
+  essayId: String!
+  search: String
+}
+
+type Mutation {
+  createCorrectionEssay(input: CreateCorrectionDto!): CorrectionResponseOneDto!
+  updateCorrectionEssay(input: UpdateCorrectionDto!): CorrectionResponseOneDto!
+}
+
+input CreateCorrectionDto {
+  essay_id: String!
+  overall_comment: String
+  rating: Float
+  sentences: [CreateCorrectionSentenceDto!]!
+}
+
+input CreateCorrectionSentenceDto {
+  original_text: String!
+  index: Float!
+  corrected_text: String!
+  explanation: String!
+  is_correct: Boolean!
+  rating: Float!
+}
+
+input UpdateCorrectionDto {
+  id: String!
+  overall_comment: String
+  rating: Float
+  sentences: [UpdateCorrectionSentenceDto!]!
+}
+
+input UpdateCorrectionSentenceDto {
+  index: Float!
+  original_text: String!
+  corrected_text: String!
+  explanation: String!
+  is_correct: Boolean!
+  rating: Float!
+}
